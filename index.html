@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ספירה לאחור (-) עומר</title>
+    <style>
+        :root {
+            --bg-color: #f5f5f7;
+            --container-bg: #ffffff;
+            --text-color: #1d1d1f;
+            --box-bg: #f5f5f7;
+            --sub-text: #86868b;
+            --balloon-string: rgba(0,0,0,0.1);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #000000;
+                --container-bg: #1c1c1e;
+                --text-color: #ffffff;
+                --box-bg: #2c2c2e;
+                --sub-text: #98989d;
+                --balloon-string: rgba(255,255,255,0.2);
+            }
+        }
+
+        body.light-mode {
+            --bg-color: #f5f5f7;
+            --container-bg: #ffffff;
+            --text-color: #1d1d1f;
+            --box-bg: #f5f5f7;
+            --sub-text: #86868b;
+            --balloon-string: rgba(0,0,0,0.1);
+        }
+
+        body.dark-mode {
+            --bg-color: #000000;
+            --container-bg: #1c1c1e;
+            --text-color: #ffffff;
+            --box-bg: #2c2c2e;
+            --sub-text: #98989d;
+            --balloon-string: rgba(255,255,255,0.2);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+            overflow: hidden; 
+            position: relative;
+        }
+        
+        .light-spread {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: transparent;
+            pointer-events: none;
+            z-index: 15; 
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+        
+        body.disco-active .light-spread {
+            opacity: 1;
+            animation: flashLights 1s infinite;
+        }
+
+        @keyframes flashLights {
+            0%, 100% { background: radial-gradient(circle at 50% 10%, rgba(255,255,255,0.3) 0%, transparent 70%); }
+            20% { background: radial-gradient(circle at 10% 40%, rgba(255,0,0,0.2) 0%, transparent 70%); }
+            40% { background: radial-gradient(circle at 90% 60%, rgba(0,255,0,0.2) 0%, transparent 70%); }
+            60% { background: radial-gradient(circle at 30% 90%, rgba(0,0,255,0.2) 0%, transparent 70%); }
+            80% { background: radial-gradient(circle at 70% 30%, rgba(255,255,0,0.2) 0%, transparent 70%); }
+        }
+
+        .actions-container {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            flex-wrap: wrap; 
+            gap: 10px;
+            max-width: 90vw;
+            z-index: 40; 
+        }
+
+        .btn-pill {
+            background: var(--container-bg);
+            color: var(--text-color);
+            border: 1px solid var(--sub-text);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+            direction: ltr; 
+        }
+
+        .btn-pill:active {
+            transform: scale(0.98);
+        }
+
+        .btn-disco.active {
+            background: #FFD700; 
+            color: #000;
+            border-color: #FFD700;
+        }
+
+        .btn-koali.active {
+            background: #a29bfe; 
+            color: #000;
+            border-color: #a29bfe;
+        }
+
+        .container {
+            text-align: center;
+            background: var(--container-bg);
+            padding: 3rem 1.5rem;
+            border-radius: 24px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+            width: 90%;
+            max-width: 380px;
+            transition: background-color 0.3s;
+            position: relative;
+            z-index: 10; 
+        }
+        
+        .title-box {
+            background: var(--box-bg);
+            padding: 1.5rem;
+            border-radius: 16px;
+            margin-bottom: 2.5rem;
+            transition: background-color 0.3s;
+        }
+        h1 {
+            font-size: 1.6rem;
+            font-weight: 600;
+            margin: 0 0 0.4rem 0;
+            letter-spacing: -0.02em;
+        }
+        .subtitle {
+            font-size: 0.95rem;
+            color: var(--sub-text);
+            margin: 0;
+        }
+        .timer-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        .time-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: var(--box-bg);
+            padding: 12px 5px;
+            border-radius: 14px;
+            flex: 1;
+            transition: background-color 0.3s;
+        }
+        .number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+        .label {
+            font-size: 0.8rem;
+            color: var(--sub-text);
+            font-weight: 500;
+        }
+        .summary-box {
+            background: var(--box-bg);
+            padding: 1.2rem;
+            border-radius: 16px;
+            margin-top: 2.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+
+        /* בלונים */
+        .balloon {
+            position: fixed;
+            bottom: -150px; 
+            width: 60px;
+            height: 80px;
+            border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%; 
+            opacity: 0.9;
+            z-index: 20; 
+            animation: flyUp 6s linear forwards;
+            pointer-events: none; 
+        }
+
+        .balloon::before {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-left: 7px solid transparent;
+            border-right: 7px solid transparent;
+            border-bottom: 12px solid; 
+            border-bottom-color: inherit;
+        }
+
+        .balloon::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            width: 1px;
+            height: 120px;
+            background-color: var(--balloon-string);
+            transform-origin: top center;
+            animation: sway 1.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes flyUp {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-130vh) rotate(20deg); opacity: 0; } 
+        }
+
+        @keyframes sway {
+            0% { transform: translateX(0) rotate(0deg); }
+            100% { transform: translateX(10px) rotate(4deg); }
+        }
+
+        /* כדור דיסקו */
+        .disco-ball-container {
+            position: fixed;
+            top: -200px; 
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 18; 
+            transition: top 1s ease-out;
+            pointer-events: none;
+        }
+        
+        body.disco-active .disco-ball-container {
+            top: 20px; 
+        }
+        
+        .disco-ball {
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle at 30% 30%, #fff 0%, #aaa 40%, #555 100%);
+            border-radius: 50%;
+            position: relative;
+            box-shadow: 0 0 20px rgba(255,255,255,0.5);
+            overflow: hidden;
+            animation: spinDisco 5s linear infinite;
+        }
+        
+        .disco-ball::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px),
+                linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 10px 10px;
+        }
+        
+        @keyframes spinDisco {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* קונפטי */
+        .confetti-piece {
+            position: fixed;
+            width: 10px;
+            height: 20px;
+            top: -20px;
+            z-index: 100; 
+            animation: fall linear forwards;
+            pointer-events: none;
+        }
+
+        @keyframes fall {
+            0% { transform: translateY(0) rotate(0deg); }
+            100% { transform: translateY(120vh) rotate(720deg); }
+        }
+
+        /* קוואלי הדוב - חוזר למטה וקופץ גבוה יותר */
+        .koali-wrapper {
+            position: fixed;
+            bottom: -250px; 
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 50; 
+            transition: bottom 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: none;
+        }
+
+        .koali-wrapper.show {
+            bottom: 70vh; /* הגובה תוקן ל-70% כדי לא להסתיר את הטקסט */
+        }
+
+        .koali-dancer {
+            font-size: 6rem;
+            line-height: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .koali-hat {
+            font-size: 3rem;
+            margin-bottom: -15px;
+            transform: rotate(15deg);
+        }
+
+        .koali-wrapper.show .koali-dancer {
+            animation: danceKoala 0.6s infinite alternate ease-in-out;
+        }
+
+        @keyframes danceKoala {
+            0% { transform: rotate(-15deg) scale(1); }
+            100% { transform: rotate(15deg) scale(1.05); }
+        }
+
+    </style>
+</head>
+<body class="light-mode">
+    <div class="light-spread"></div>
+    <div class="actions-container">
+        <button id="theme-toggle" class="btn-pill"> תאורה</button>
+        <button id="balloon-trigger" class="btn-pill">🎈 בלונים</button>
+        <button id="disco-trigger" class="btn-pill btn-disco">🪩 כדור דיסקו</button>
+        <button id="confetti-trigger" class="btn-pill">🎉 קונפטי</button>
+        <button id="koali-trigger" class="btn-pill btn-koali">🐨 קוואלי</button>
+    </div>
+    
+    <div class="disco-ball-container">
+        <div class="disco-ball"></div>
+    </div>
+    
+    <div id="koali-wrapper" class="koali-wrapper">
+        <div class="koali-dancer">
+            <span class="koali-hat">🥳</span>
+            <span class="koali-body">🐨</span>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="title-box">
+            <h1>יומולדת 8 לעומר</h1>
+            <div class="subtitle">1 באפריל 2026</div>
+        </div>
+        
+        <div class="timer-container">
+            <div class="time-box">
+                <span class="number" id="days">0</span>
+                <span class="label">ימים</span>
+            </div>
+            <div class="time-box">
+                <span class="number" id="hours">0</span>
+                <span class="label">שעות</span>
+            </div>
+            <div class="time-box">
+                <span class="number" id="minutes">0</span>
+                <span class="label">דקות</span>
+            </div>
+            <div class="time-box">
+                <span class="number" id="seconds">0</span>
+                <span class="label">שניות</span>
+            </div>
+        </div>
+
+        <div class="summary-box" id="weeks-summary">
+            מחשב נתונים...
+        </div>
+    </div>
+
+    <script>
+        const themeBtn = document.getElementById("theme-toggle");
+        const body = document.body;
+        
+        themeBtn.addEventListener("click", function() {
+            if (body.classList.contains("dark-mode")) {
+                body.classList.remove("dark-mode");
+                body.classList.add("light-mode");
+            } else if (body.classList.contains("light-mode")) {
+                body.classList.remove("light-mode");
+                body.classList.add("dark-mode");
+            } else {
+                if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+                    body.classList.add("light-mode");
+                } else {
+                    body.classList.add("dark-mode");
+                }
+            }
+        });
+
+        const colorPalette = ['#FF6B6B', '#4ECDC4', '#FFE66D', '#74B9FF', '#A29BFE', '#FFB142', '#FF9F43', '#2ecc71', '#e74c3c'];
+
+        // בלונים
+        const balloonBtn = document.getElementById("balloon-trigger");
+        balloonBtn.addEventListener("click", function() {
+            createBalloons(15); 
+        });
+
+        function createBalloons(num) {
+            for (let i = 0; i < num; i++) {
+                const balloon = document.createElement('div');
+                balloon.className = 'balloon';
+
+                const color = colorPalette[Math.floor(Math.random() * colorPalette.length)];
+                balloon.style.backgroundColor = color;
+                balloon.style.color = color; 
+
+                balloon.style.left = (Math.random() * 100) + 'vw';
+                
+                const duration = 5 + Math.random() * 5; 
+                balloon.style.animationDuration = duration + 's';
+                balloon.style.animationDelay = (Math.random() * 3) + 's'; 
+                
+                const scale = 0.7 + Math.random() * 0.4;
+                balloon.style.transform = `scale(${scale})`;
+
+                body.appendChild(balloon);
+
+                setTimeout(() => {
+                    balloon.remove();
+                }, (duration + 3) * 1000); 
+            }
+        }
+        
+        // כדור דיסקו
+        const discoBtn = document.getElementById("disco-trigger");
+        discoBtn.addEventListener("click", function() {
+            body.classList.toggle("disco-active");
+            discoBtn.classList.toggle("active");
+        });
+
+        // קונפטי
+        const confettiBtn = document.getElementById("confetti-trigger");
+        confettiBtn.addEventListener("click", function() {
+            createConfetti(100);
+        });
+
+        function createConfetti(num) {
+            for (let i = 0; i < num; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti-piece';
+                
+                confetti.style.backgroundColor = colorPalette[Math.floor(Math.random() * colorPalette.length)];
+                confetti.style.left = Math.random() * 100 + 'vw';
+                
+                const duration = 2 + Math.random() * 3;
+                confetti.style.animationDuration = duration + 's';
+                confetti.style.animationDelay = Math.random() * 2 + 's';
+                
+                if (Math.random() > 0.5) {
+                    confetti.style.borderRadius = '50%';
+                    confetti.style.width = '10px';
+                    confetti.style.height = '10px';
+                }
+
+                body.appendChild(confetti);
+
+                setTimeout(() => {
+                    confetti.remove();
+                }, (duration + 2) * 1000);
+            }
+        }
+
+        // קוואלי הדוב
+        const koaliBtn = document.getElementById("koali-trigger");
+        const koaliWrapper = document.getElementById("koali-wrapper");
+
+        koaliBtn.addEventListener("click", function() {
+            koaliWrapper.classList.toggle("show");
+            koaliBtn.classList.toggle("active");
+        });
+
+        // טיימר
+        const targetDate = new Date("April 1, 2026 00:00:00").getTime();
+        
+        function getWeeksAndDaysText(totalDays) {
+            const w = Math.floor(totalDays / 7);
+            const d = totalDays % 7;
+            
+            let wStr = w + " שבועות";
+            if (w === 1) wStr = "שבוע אחד";
+            if (w === 2) wStr = "שבועיים";
+            
+            let dStr = d + " ימים";
+            if (d === 1) dStr = "יום אחד";
+            if (d === 2) dStr = "יומיים";
+            
+            let text = "וכמו שעומר אוהב, זה אומר ";
+            if (w > 0 && d > 0) {
+                text += wStr + " ו-" + dStr;
+            } else if (w > 0) {
+                text += wStr;
+            } else if (d > 0) {
+                text += dStr;
+            } else {
+                text = "מזל טוב!";
+            }
+            return text;
+        }
+
+        const interval = setInterval(function() {
+            const now = new Date().getTime();
+            const distance = targetDate - now;
+            
+            if (distance < 0) {
+                clearInterval(interval);
+                document.querySelector(".timer-container").innerHTML = "<h2>הגיע הזמן!</h2>";
+                document.getElementById("weeks-summary").innerText = "מזל טוב לעומר!";
+                return;
+            }
+
+            const totalDays = Math.floor(distance / (1000 * 60 * 60 * 24));
+            
+            document.getElementById("days").innerText = totalDays;
+            document.getElementById("hours").innerText = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            document.getElementById("minutes").innerText = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            document.getElementById("seconds").innerText = Math.floor((distance % (1000 * 60)) / 1000);
+
+            document.getElementById("weeks-summary").innerText = getWeeksAndDaysText(totalDays);
+        }, 1000);
+    </script>
+</body>
+</html>
