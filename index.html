@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ספירה לאחור (-) עומר</title>
+    <title>ספירה לאחור - עומר</title>
     <style>
         :root {
             --bg-color: #f5f5f7;
@@ -121,6 +121,12 @@
             background: #a29bfe; 
             color: #000;
             border-color: #a29bfe;
+        }
+
+        .btn-lego.active {
+            background: #ff8200; 
+            color: #fff;
+            border-color: #ff8200;
         }
 
         .container {
@@ -293,7 +299,7 @@
             100% { transform: translateY(120vh) rotate(720deg); }
         }
 
-        /* קוואלי הדוב - חוזר למטה וקופץ גבוה יותר */
+        /* קוואלי הדוב */
         .koali-wrapper {
             position: fixed;
             bottom: -250px; 
@@ -305,7 +311,7 @@
         }
 
         .koali-wrapper.show {
-            bottom: 70vh; /* הגובה תוקן ל-70% כדי לא להסתיר את הטקסט */
+            bottom: 70vh; 
         }
 
         .koali-dancer {
@@ -331,6 +337,31 @@
             100% { transform: rotate(15deg) scale(1.05); }
         }
 
+        /* לגו */
+        #lego-8-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 96px; 
+            height: 168px; 
+            z-index: 60;
+            pointer-events: none;
+        }
+
+        .lego-piece {
+            position: absolute;
+            box-sizing: border-box;
+            border: 1px solid rgba(0,0,0,0.5);
+            border-top: 2px solid rgba(255,255,255,0.5);
+            border-left: 2px solid rgba(255,255,255,0.2);
+            border-right: 2px solid rgba(0,0,0,0.3);
+            border-bottom: 2px solid rgba(0,0,0,0.4);
+            border-radius: 2px;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+            transition: top 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
     </style>
 </head>
 <body class="light-mode">
@@ -341,6 +372,7 @@
         <button id="disco-trigger" class="btn-pill btn-disco">🪩 כדור דיסקו</button>
         <button id="confetti-trigger" class="btn-pill">🎉 קונפטי</button>
         <button id="koali-trigger" class="btn-pill btn-koali">🐨 קוואלי</button>
+        <button id="lego-trigger" class="btn-pill btn-lego">🧱 לגו</button>
     </div>
     
     <div class="disco-ball-container">
@@ -353,6 +385,8 @@
             <span class="koali-body">🐨</span>
         </div>
     </div>
+
+    <div id="lego-8-container"></div>
 
     <div class="container">
         <div class="title-box">
@@ -485,6 +519,56 @@
             koaliWrapper.classList.toggle("show");
             koaliBtn.classList.toggle("active");
         });
+
+        // בניית לגו
+        const legoBtn = document.getElementById("lego-trigger");
+        const legoContainer = document.getElementById("lego-8-container");
+        let isLegoActive = false;
+
+        legoBtn.addEventListener("click", function() {
+            if (isLegoActive) {
+                legoContainer.innerHTML = '';
+                legoBtn.classList.remove("active");
+                isLegoActive = false;
+            } else {
+                legoBtn.classList.add("active");
+                isLegoActive = true;
+                buildLegoEight();
+            }
+        });
+
+        function buildLegoEight() {
+            const blocks = [
+                {x:2, y:0, w:2, h:1}, {x:4, y:0, w:2, h:1}, {x:2, y:1, w:1, h:1}, {x:3, y:1, w:3, h:1},
+                {x:0, y:2, w:2, h:1}, {x:0, y:3, w:1, h:2}, {x:1, y:3, w:1, h:1}, {x:1, y:4, w:1, h:3}, {x:0, y:5, w:1, h:2},
+                {x:6, y:2, w:2, h:2}, {x:6, y:4, w:1, h:3}, {x:7, y:4, w:1, h:1}, {x:7, y:5, w:1, h:2},
+                {x:2, y:6, w:2, h:1}, {x:4, y:6, w:1, h:1}, {x:5, y:6, w:1, h:2}, {x:2, y:7, w:3, h:1},
+                {x:0, y:7, w:2, h:1}, {x:0, y:8, w:1, h:2}, {x:1, y:8, w:1, h:1}, {x:1, y:9, w:1, h:3}, {x:0, y:10, w:1, h:2},
+                {x:6, y:7, w:2, h:2}, {x:6, y:9, w:1, h:3}, {x:7, y:9, w:1, h:1}, {x:7, y:10, w:1, h:2},
+                {x:2, y:12, w:1, h:1}, {x:3, y:12, w:3, h:1}, {x:2, y:13, w:2, h:1}, {x:4, y:13, w:2, h:1}
+            ];
+
+            const legoColors = ['#e3000b', '#0055bf', '#f2cd37', '#237841', '#f4f4f4', '#ff8200']; 
+            const unit = 12;
+
+            const shuffled = blocks.map(value => ({ value, sort: Math.random() })).sort((a, b) => a.sort - b.sort).map(({ value }) => value);
+
+            shuffled.forEach((b, index) => {
+                const piece = document.createElement('div');
+                piece.className = 'lego-piece';
+                piece.style.width = (b.w * unit) + 'px';
+                piece.style.height = (b.h * unit) + 'px';
+                piece.style.left = (b.x * unit) + 'px';
+                piece.style.top = '-100vh'; 
+                piece.style.backgroundColor = legoColors[Math.floor(Math.random() * legoColors.length)];
+
+                legoContainer.appendChild(piece);
+
+                setTimeout(() => {
+                    piece.style.top = (b.y * unit) + 'px';
+                }, index * 40); 
+            });
+        }
 
         // טיימר
         const targetDate = new Date("April 1, 2026 00:00:00").getTime();
