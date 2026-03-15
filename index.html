@@ -129,14 +129,21 @@
             border-color: #ff8200;
         }
 
+        .center-wrapper {
+            position: relative;
+            width: 90%;
+            max-width: 380px;
+            z-index: 10;
+        }
+
         .container {
             text-align: center;
             background: var(--container-bg);
             padding: 3rem 1.5rem;
             border-radius: 24px;
             box-shadow: 0 4px 24px rgba(0,0,0,0.06);
-            width: 90%;
-            max-width: 380px;
+            width: 100%;
+            box-sizing: border-box;
             transition: background-color 0.3s;
             position: relative;
             z-index: 10; 
@@ -337,14 +344,14 @@
             100% { transform: rotate(15deg) scale(1.05); }
         }
 
-        /* לגו */
+        /* לגו ענק משופר */
         #lego-8-container {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 96px; 
-            height: 168px; 
+            width: 220px; 
+            height: 352px; 
             z-index: 60;
             pointer-events: none;
         }
@@ -352,14 +359,17 @@
         .lego-piece {
             position: absolute;
             box-sizing: border-box;
-            border: 1px solid rgba(0,0,0,0.5);
-            border-top: 2px solid rgba(255,255,255,0.5);
-            border-left: 2px solid rgba(255,255,255,0.2);
+            border-top: 2px solid rgba(255,255,255,0.6);
+            border-left: 2px solid rgba(255,255,255,0.4);
             border-right: 2px solid rgba(0,0,0,0.3);
-            border-bottom: 2px solid rgba(0,0,0,0.4);
+            border-bottom: 2px solid rgba(0,0,0,0.5);
             border-radius: 2px;
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
-            transition: top 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 3px 3px 10px rgba(0,0,0,0.5);
+            /* טקסטורה של פינים בולטים של לגו */
+            background-image: radial-gradient(circle at 11px 11px, rgba(255,255,255,0.5) 2px, transparent 3px, rgba(0,0,0,0.15) 6px, transparent 7px);
+            background-size: 22px 22px;
+            /* ירידה איטית ומציאותית */
+            transition: top 2.5s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
 
     </style>
@@ -388,33 +398,35 @@
 
     <div id="lego-8-container"></div>
 
-    <div class="container">
-        <div class="title-box">
-            <h1>יומולדת 8 לעומר</h1>
-            <div class="subtitle">1 באפריל 2026</div>
-        </div>
-        
-        <div class="timer-container">
-            <div class="time-box">
-                <span class="number" id="days">0</span>
-                <span class="label">ימים</span>
+    <div class="center-wrapper">
+        <div class="container">
+            <div class="title-box">
+                <h1>יומולדת 8 לעומר</h1>
+                <div class="subtitle">1 באפריל 2026</div>
             </div>
-            <div class="time-box">
-                <span class="number" id="hours">0</span>
-                <span class="label">שעות</span>
+            
+            <div class="timer-container">
+                <div class="time-box">
+                    <span class="number" id="days">0</span>
+                    <span class="label">ימים</span>
+                </div>
+                <div class="time-box">
+                    <span class="number" id="hours">0</span>
+                    <span class="label">שעות</span>
+                </div>
+                <div class="time-box">
+                    <span class="number" id="minutes">0</span>
+                    <span class="label">דקות</span>
+                </div>
+                <div class="time-box">
+                    <span class="number" id="seconds">0</span>
+                    <span class="label">שניות</span>
+                </div>
             </div>
-            <div class="time-box">
-                <span class="number" id="minutes">0</span>
-                <span class="label">דקות</span>
-            </div>
-            <div class="time-box">
-                <span class="number" id="seconds">0</span>
-                <span class="label">שניות</span>
-            </div>
-        </div>
 
-        <div class="summary-box" id="weeks-summary">
-            מחשב נתונים...
+            <div class="summary-box" id="weeks-summary">
+                מחשב נתונים...
+            </div>
         </div>
     </div>
 
@@ -538,18 +550,22 @@
         });
 
         function buildLegoEight() {
+            // רשת בנייה סגורה בצורת H - סך הכל 20 קוביות גדולות
             const blocks = [
-                {x:2, y:0, w:2, h:1}, {x:4, y:0, w:2, h:1}, {x:2, y:1, w:1, h:1}, {x:3, y:1, w:3, h:1},
-                {x:0, y:2, w:2, h:1}, {x:0, y:3, w:1, h:2}, {x:1, y:3, w:1, h:1}, {x:1, y:4, w:1, h:3}, {x:0, y:5, w:1, h:2},
-                {x:6, y:2, w:2, h:2}, {x:6, y:4, w:1, h:3}, {x:7, y:4, w:1, h:1}, {x:7, y:5, w:1, h:2},
-                {x:2, y:6, w:2, h:1}, {x:4, y:6, w:1, h:1}, {x:5, y:6, w:1, h:2}, {x:2, y:7, w:3, h:1},
-                {x:0, y:7, w:2, h:1}, {x:0, y:8, w:1, h:2}, {x:1, y:8, w:1, h:1}, {x:1, y:9, w:1, h:3}, {x:0, y:10, w:1, h:2},
-                {x:6, y:7, w:2, h:2}, {x:6, y:9, w:1, h:3}, {x:7, y:9, w:1, h:1}, {x:7, y:10, w:1, h:2},
-                {x:2, y:12, w:1, h:1}, {x:3, y:12, w:3, h:1}, {x:2, y:13, w:2, h:1}, {x:4, y:13, w:2, h:1}
+                // עמוד שמאלי
+                {x:0, y:0, w:2, h:4}, {x:0, y:4, w:2, h:3}, {x:0, y:7, w:2, h:5}, {x:0, y:12, w:2, h:4},
+                // עמוד ימני
+                {x:8, y:0, w:2, h:3}, {x:8, y:3, w:2, h:5}, {x:8, y:8, w:2, h:4}, {x:8, y:12, w:2, h:4},
+                // חיבור עליון
+                {x:2, y:0, w:4, h:1}, {x:6, y:0, w:2, h:1}, {x:2, y:1, w:3, h:1}, {x:5, y:1, w:3, h:1},
+                // חיבור אמצעי
+                {x:2, y:7, w:2, h:1}, {x:4, y:7, w:4, h:1}, {x:2, y:8, w:4, h:1}, {x:6, y:8, w:2, h:1},
+                // חיבור תחתון
+                {x:2, y:14, w:3, h:1}, {x:5, y:14, w:3, h:1}, {x:2, y:15, w:4, h:1}, {x:6, y:15, w:2, h:1}
             ];
 
             const legoColors = ['#e3000b', '#0055bf', '#f2cd37', '#237841', '#f4f4f4', '#ff8200']; 
-            const unit = 12;
+            const unit = 22;
 
             const shuffled = blocks.map(value => ({ value, sort: Math.random() })).sort((a, b) => a.sort - b.sort).map(({ value }) => value);
 
@@ -564,9 +580,10 @@
 
                 legoContainer.appendChild(piece);
 
+                // השהייה מוגדלת לנפילה הדרגתית ומרשימה
                 setTimeout(() => {
                     piece.style.top = (b.y * unit) + 'px';
-                }, index * 40); 
+                }, index * 150); 
             });
         }
 
